@@ -39,4 +39,6 @@ Navigate to `http://localhost:8080/`.
 
 The site survey, quote, contact, and newsletter forms submit to `salesgreentechpower2@gmail.com` through [FormSubmit](https://formsubmit.co/) using standard HTML POST. FormSubmit shows its confirmation or thank-you page after a submission. The first submission triggers an activation email at that address. Open it and confirm the form before expecting lead emails. Check the spam folder if the activation message does not appear.
 
+CAPTCHA is disabled on these forms to remove the extra step. A hidden honeypot field helps filter basic automated submissions; FormSubmit may still apply its own spam limits.
+
 Serve the site over HTTP or HTTPS when testing forms; FormSubmit does not support submitting pages opened as local `file://` documents. The newsletter form sends a signup request to the sales inbox; adding that address to a mailing list is a separate step.
