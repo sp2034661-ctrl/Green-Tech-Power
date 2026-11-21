@@ -4822,3 +4822,60 @@ body.mobile-menu-active {
     font-size: 8.5px !important;
   }
 }
+
+/* ----------------------------------------------------
+   AJAX Form Submission Alerts & Feedbacks
+---------------------------------------------------- */
+.form-status-alert {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: fadeInFormAlert 0.35s ease-out forwards;
+}
+
+@keyframes fadeInFormAlert {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-status-success {
+  background-color: #ecfdf3;
+  color: #027a48;
+  border: 1px solid #a6f4c5;
+}
+
+.form-status-success i {
+  font-size: 20px;
+  color: #12b76a;
+  flex-shrink: 0;
+}
+
+.form-status-error {
+  background-color: #fef3f2;
+  color: #b42318;
+  border: 1px solid #fecdca;
+}
+
+.form-status-error i {
+  font-size: 20px;
+  color: #f04438;
+  flex-shrink: 0;
+}
+
+.form-status-error a {
+  color: #b42318;
+  font-weight: 700;
+  text-decoration: underline;
+}

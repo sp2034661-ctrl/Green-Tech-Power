@@ -379,4 +379,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
   window.addEventListener('scroll', animateCounters);
   animateCounters();
+
+  // 11. Universal Background AJAX Form Submission Handler (Zero Page Redirects)
+  const allSubmittableForms = document.querySelectorAll(
+    '#contactForm, #quoteModalForm, .contact-form, .solar-lead-form, .modal-form, .footer-newsletter-form'
+  );
+
+  allSubmittableForms.forEach(form => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnContent = submitBtn ? submitBtn.innerHTML : '';
+
+      // Clean up any existing alert inside the form
+      const existingAlert = form.querySelector('.form-status-alert');
+      if (existingAlert) existingAlert.remove();
+
+      // Set button to loading state
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Submitting...</span>';
+      }
+
+      // Determine endpoint: support FormSubmit AJAX and Web3Forms seamlessly
+      let endpoint = form.getAttribute('action') || '';
+      if (endpoint.includes('formsubmit.co/') && !endpoint.includes('formsubmit.co/ajax/')) {
+        endpoint = endpoint.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+      }
+
+      try {
+        const formData = new FormData(form);
+        const objectData = Object.fromEntries(formData.entries());
+
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(objectData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && (result.success === 'true' || result.success === true || result.success === undefined)) {
+          // Success alert
+          const alert = document.createElement('div');
+          alert.className = 'form-status-alert form-status-success';
+          alert.innerHTML = '<i class="fas fa-check-circle"></i> <div><strong>Thank you!</strong> Your request has been received. Our solar engineer will contact you shortly.</div>';
+
+          if (submitBtn) {
+            submitBtn.parentNode.insertBefore(alert, submitBtn);
+          } else {
+            form.appendChild(alert);
+          }
+
+          form.reset();
+
+          // If the form is inside a modal, close it smoothly after 3 seconds
+          const modalOverlay = form.closest('.modal-overlay');
+          if (modalOverlay) {
+            setTimeout(() => {
+              modalOverlay.classList.remove('active');
+              alert.remove();
+            }, 3000);
+          }
+        } else {
+          throw new Error(result.message || 'Submission failed');
+        }
+      } catch (err) {
+        console.error('Form submission error:', err);
+        const alert = document.createElement('div');
+        alert.className = 'form-status-alert form-status-error';
+        const isActivationNotice = err.message && (err.message.toLowerCase().includes('confirm') || err.message.toLowerCase().includes('activate'));
+        alert.innerHTML = '<i class="fas fa-exclamation-circle"></i> <div>' +
+          (isActivationNotice
+            ? '<strong>Form Activation Required:</strong> Please check salesgreentechpower2@gmail.com inbox and click "Activate Form".'
+            : '<strong>Notice:</strong> Unable to send inquiry right now. Please call us directly at <a href="tel:+919415078910">+91 94150 78910</a> or message on WhatsApp.') +
+          '</div>';
+
+        if (submitBtn) {
+          submitBtn.parentNode.insertBefore(alert, submitBtn);
+        } else {
+          form.appendChild(alert);
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnContent;
+        }
+      }
+    });
+  });
 });
