@@ -105,19 +105,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 4. Toast Notification Utility
-  function showToast(message, title = 'Request Received!') {
+  function showToast(message, title = 'Request Received!', isError = false) {
     // Remove existing toasts
     document.querySelectorAll('.toast-notice').forEach(t => t.remove());
 
     const toast = document.createElement('div');
     toast.className = 'toast-notice show';
-    toast.innerHTML = `
-      <i class="fas fa-check-circle" style="color: #4AAB3D; font-size: 24px; flex-shrink: 0;"></i>
-      <div>
-        <strong style="display:block; font-size: 15px; margin-bottom: 2px; color: #001A29;">${title}</strong>
-        <span style="font-size: 13.5px; color: #5A6D7C;">${message}</span>
-      </div>
-    `;
+    toast.setAttribute('role', isError ? 'alert' : 'status');
+    const icon = document.createElement('i');
+    icon.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+    icon.style.cssText = `color: ${isError ? '#B42318' : '#4AAB3D'}; font-size: 24px; flex-shrink: 0;`;
+    const content = document.createElement('div');
+    const heading = document.createElement('strong');
+    heading.style.cssText = 'display:block; font-size:15px; margin-bottom:2px; color:#001A29;';
+    heading.textContent = title;
+    const body = document.createElement('span');
+    body.style.cssText = 'font-size:13.5px; color:#5A6D7C;';
+    body.textContent = message;
+    content.append(heading, body);
+    toast.append(icon, content);
     document.body.appendChild(toast);
 
     setTimeout(() => {
@@ -163,53 +169,46 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Form Submission Handlers
-  // A. Lead Forms (index.html)
-  document.querySelectorAll('form.solar-lead-form').forEach(form => {
-    form.addEventListener('submit', (e) => {
+  // 6. Send every form to the sales inbox through FormSubmit's static-site endpoint.
+  document.querySelectorAll('form.solar-lead-form, form.modal-form, form.contact-form, form.footer-newsletter-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const nameInput = form.querySelector('input[type="text"]');
-      const phoneInput = form.querySelector('input[type="tel"]');
-      const name = nameInput ? nameInput.value : 'Customer';
-      const phone = phoneInput ? phoneInput.value : '';
-      closeAllModals();
-      showToast(`Thank you, ${name}! Our Lucknow solar engineer will contact you at ${phone} to schedule your free 3D site audit.`, 'Free Audit Scheduled!');
-      form.reset();
-    });
-  });
+      const submitButton = form.querySelector('[type="submit"]');
+      if (submitButton?.disabled) return;
 
-  // B. Modal Form (about, services, calculator, projects, contact)
-  document.querySelectorAll('form.modal-form, #quoteModalForm').forEach(form => {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const nameInput = form.querySelector('input[type="text"]');
-      const phoneInput = form.querySelector('input[type="tel"]');
-      const name = nameInput ? nameInput.value : 'Customer';
-      const phone = phoneInput ? phoneInput.value : '';
-      closeAllModals();
-      showToast(`Thank you, ${name}! Your ₹1,08,000 subsidy eligibility inquiry has been submitted. We will call you at ${phone}.`, 'Subsidy Claim Submitted!');
-      form.reset();
-    });
-  });
+      const isNewsletter = form.classList.contains('footer-newsletter-form');
+      const name = form.elements.namedItem('name')?.value?.trim() || 'Customer';
+      const phone = form.elements.namedItem('phone')?.value?.trim() || '';
+      const fields = Object.fromEntries(new FormData(form));
+      fields._subject = form.dataset.subject || 'New GreenTech Power inquiry';
+      fields._template = 'table';
+      fields._url = window.location.href;
 
-  // C. Dedicated Contact Form (contact.html)
-  const contactForm = document.getElementById('contactForm');
-  contactForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const nameInput = contactForm.querySelector('input[type="text"]');
-    const phoneInput = contactForm.querySelector('input[type="tel"]');
-    const name = nameInput ? nameInput.value : 'Customer';
-    const phone = phoneInput ? phoneInput.value : '';
-    showToast(`Thank you, ${name}! Your message has been received. Our Gomti Nagar, Lucknow team will contact you at ${phone} today.`, 'Inquiry Received!');
-    contactForm.reset();
-  });
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const response = await fetch(form.action.replace('https://formsubmit.co/', 'https://formsubmit.co/ajax/'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(fields)
+        });
+        const result = await response.json();
+        if (!response.ok || (result.success !== true && result.success !== 'true')) {
+          throw new Error(result.message || 'Form submission failed');
+        }
 
-  // D. Newsletter Form
-  document.querySelectorAll('.footer-newsletter-form').forEach(form => {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      showToast('You are now subscribed to PM Surya Ghar & UP Solar Subsidy policy updates.', 'Subscribed Successfully!');
-      form.reset();
+        if (isNewsletter) {
+          showToast('Your newsletter signup request has been sent to our team.', 'Request Received!');
+        } else {
+          showToast(`Thank you, ${name}! Your request has been sent. Our team will contact you${phone ? ` at ${phone}` : ''}.`, 'Inquiry Sent!');
+        }
+        form.reset();
+        closeAllModals();
+      } catch (error) {
+        console.error('Could not send form:', error);
+        showToast('We could not send your request. Please try again or call +91 94150 78910.', 'Sending Failed', true);
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   });
 

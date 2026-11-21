@@ -34,3 +34,9 @@ python -m http.server 8080
 ```
 
 Navigate to `http://localhost:8080/`.
+
+## Form email delivery
+
+The site survey, quote, contact, and newsletter forms submit to `salesgreentechpower2@gmail.com` through [FormSubmit](https://formsubmit.co/). The first submission triggers an activation email at that address. Open it and confirm the form before expecting lead emails. Check the spam folder if the activation message does not appear.
+
+Serve the site over HTTP or HTTPS when testing forms; FormSubmit does not support submitting pages opened as local `file://` documents. The newsletter form sends a signup request to the sales inbox; adding that address to a mailing list is a separate step.
