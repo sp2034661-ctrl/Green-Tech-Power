@@ -132,7 +132,9 @@
           <h3>Book A Free Site Assessment</h3>
           <p>Fill out the form below. Our engineer will review your electricity consumption and reach out within 15 minutes.</p>
 
-          <form id="contactForm" class="contact-form" action="https://formsubmit.co/salesgreentechpower2@gmail.com" method="POST" data-subject="New contact inquiry - GreenTech Power">
+          <form id="contactForm" class="contact-form" action="https://formsubmit.co/salesgreentechpower2@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New contact inquiry - GreenTech Power">
+            <input type="hidden" name="_template" value="table">
             <div class="form-grid">
               <div class="form-group">
                 <label>Your Full Name *</label>
@@ -231,7 +233,9 @@
         <span class="modal-badge"><i class="fas fa-bolt"></i> Free Quote</span>
         <h3>Get Free Solar Assessment</h3>
       </div>
-      <form class="modal-form" id="quoteModalForm" action="https://formsubmit.co/salesgreentechpower2@gmail.com" method="POST" data-subject="New quote request - GreenTech Power">
+      <form class="modal-form" id="quoteModalForm" action="https://formsubmit.co/salesgreentechpower2@gmail.com" method="POST">
+        <input type="hidden" name="_subject" value="New quote request - GreenTech Power">
+        <input type="hidden" name="_template" value="table">
         <div class="form-group"><label>Full Name *</label><input type="text" name="name" required></div>
         <div class="form-group"><label>Mobile Number *</label><input type="tel" name="phone" pattern="[0-9]{10}" required></div>
         <button type="submit" class="btn-creative btn-block"><span>Claim ₹1,08,000 Subsidy</span><i class="fas fa-arrow-right"></i></button>

@@ -104,35 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 4. Toast Notification Utility
-  function showToast(message, title = 'Request Received!', isError = false) {
-    // Remove existing toasts
-    document.querySelectorAll('.toast-notice').forEach(t => t.remove());
-
-    const toast = document.createElement('div');
-    toast.className = 'toast-notice show';
-    toast.setAttribute('role', isError ? 'alert' : 'status');
-    const icon = document.createElement('i');
-    icon.className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
-    icon.style.cssText = `color: ${isError ? '#B42318' : '#4AAB3D'}; font-size: 24px; flex-shrink: 0;`;
-    const content = document.createElement('div');
-    const heading = document.createElement('strong');
-    heading.style.cssText = 'display:block; font-size:15px; margin-bottom:2px; color:#001A29;';
-    heading.textContent = title;
-    const body = document.createElement('span');
-    body.style.cssText = 'font-size:13.5px; color:#5A6D7C;';
-    body.textContent = message;
-    content.append(heading, body);
-    toast.append(icon, content);
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 400);
-    }, 4500);
-  }
-
-  // 5. Universal Modal Management (Consultation & Subsidy Claim)
+  // 4. Universal Modal Management (Consultation & Subsidy Claim)
   const allModalOpenBtns = document.querySelectorAll('.open-modal-btn');
   const modalOverlays = document.querySelectorAll('.modal-overlay');
 
@@ -169,50 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Send every form to the sales inbox through FormSubmit's static-site endpoint.
-  document.querySelectorAll('form.solar-lead-form, form.modal-form, form.contact-form, form.footer-newsletter-form').forEach(form => {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const submitButton = form.querySelector('[type="submit"]');
-      if (submitButton?.disabled) return;
-
-      const isNewsletter = form.classList.contains('footer-newsletter-form');
-      const name = form.elements.namedItem('name')?.value?.trim() || 'Customer';
-      const phone = form.elements.namedItem('phone')?.value?.trim() || '';
-      const fields = Object.fromEntries(new FormData(form));
-      fields._subject = form.dataset.subject || 'New GreenTech Power inquiry';
-      fields._template = 'table';
-      fields._url = window.location.href;
-
-      if (submitButton) submitButton.disabled = true;
-      try {
-        const response = await fetch(form.action.replace('https://formsubmit.co/', 'https://formsubmit.co/ajax/'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify(fields)
-        });
-        const result = await response.json();
-        if (!response.ok || (result.success !== true && result.success !== 'true')) {
-          throw new Error(result.message || 'Form submission failed');
-        }
-
-        if (isNewsletter) {
-          showToast('Your newsletter signup request has been sent to our team.', 'Request Received!');
-        } else {
-          showToast(`Thank you, ${name}! Your request has been sent. Our team will contact you${phone ? ` at ${phone}` : ''}.`, 'Inquiry Sent!');
-        }
-        form.reset();
-        closeAllModals();
-      } catch (error) {
-        console.error('Could not send form:', error);
-        showToast('We could not send your request. Please try again or call +91 94150 78910.', 'Sending Failed', true);
-      } finally {
-        if (submitButton) submitButton.disabled = false;
-      }
-    });
-  });
-
-  // 7. Interactive Solar Subsidy & Savings Calculator (Home Page Preview)
+  // 5. Interactive Solar Subsidy & Savings Calculator (Home Page Preview)
   const billSlider = document.getElementById('billSlider');
   const billDisplay = document.getElementById('billDisplay');
   const calcCapacity = document.getElementById('calcCapacity');
@@ -279,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 8. Dedicated Subsidy Calculator Page Engine (calculator.html)
+  // 6. Dedicated Subsidy Calculator Page Engine (calculator.html)
   const kwSlider = document.getElementById('kwSlider');
   const kwDisplay = document.getElementById('kwDisplay');
   const calcBtns = document.querySelectorAll('.calc-btn');
@@ -344,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePageCalculator(3);
   }
 
-  // 9. Portfolio Filter Tabs (Works on both index.html and projects.html)
+  // 7. Portfolio Filter Tabs (Works on both index.html and projects.html)
   const allFilterButtons = document.querySelectorAll('.filter-btn, .filter-tab-btn');
   allFilterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -368,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 10. FAQ Accordions
+  // 8. FAQ Accordions
   const accordionItems = document.querySelectorAll('.accordion-item');
   accordionItems.forEach(item => {
     const header = item.querySelector('.accordion-header');
@@ -381,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 11. Solar Installation Video Player Controller
+  // 9. Solar Installation Video Player Controller
   const videoElem = document.getElementById('solarInstallVideo');
   const playBtn = document.getElementById('playVideoBtn');
   const videoOverlay = document.getElementById('videoOverlay');
@@ -418,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 12. Animated Statistics Counter on Viewport Entry
+  // 10. Animated Statistics Counter on Viewport Entry
   const counterElements = document.querySelectorAll('.counter-number[data-target]');
   let countersAnimated = false;
 
